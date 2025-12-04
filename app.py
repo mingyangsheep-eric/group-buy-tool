@@ -1,36 +1,49 @@
 import streamlit as st
-import datetime
 
 # --- 網頁設定 ---
-st.set_page_config(page_title="團購文案生成助手", page_icon="🛍️")
+st.set_page_config(page_title="醫師團課揪團生成器", page_icon="👨‍⚕️")
 
 # --- 標題區 ---
-st.title("🛍️ 團購文案生成助手")
-st.markdown("只要填寫下方資訊，就能一鍵生成精美的 LINE/FB 揪團文案！")
+st.title("👨‍⚕️ 醫師團課揪團生成器 (AI Powered)")
+st.caption("🚀 這是由 Google AI Studio 輔助生成的程式碼")
+st.markdown("只要填寫課程資訊，就能一鍵生成精美的 LINE/FB 揪團文案！")
 
 # --- 輸入區 ---
 col1, col2 = st.columns(2)
 with col1:
-    product_name = st.text_input("商品名稱", placeholder="例如：Dyson 吹風機")
-    original_price = st.number_input("原價 (元)", min_value=0)
+    course_name = st.text_input("課程名稱", placeholder="例如：進階超音波實戰工作坊")
+    original_price = st.number_input("原價學費 (元)", min_value=0)
 with col2:
-    group_price = st.number_input("團購價 (元)", min_value=0)
+    group_price = st.number_input("團報優惠價 (元)", min_value=0)
 
-product_desc = st.text_area("商品特色", placeholder="為什麼要買這個？")
-product_link = st.text_input("下單連結", placeholder="https://...")
+# 計算折扣
+if original_price > 0 and group_price > 0:
+    discount = original_price - group_price
+    st.info(f"💡 這樣每人可以省下：${discount} 元")
 
-# --- 按鈕與邏輯 ---
+course_highlights = st.text_area("課程亮點 / 學分資訊", placeholder="例如：可申請急救加護學分、手把手教學、名額有限...")
+course_link = st.text_input("報名連結", placeholder="https://...")
+
+# --- 按鈕與文案生成邏輯 ---
 if st.button("✨ 生成揪團文案", type="primary"):
-    if not product_name:
-        st.error("請輸入商品名稱！")
+    if not course_name:
+        st.error("請輸入課程名稱！")
     else:
         # 這裡就是把資料組裝起來的地方
-        result = f"🔥 【限時團購】{product_name} 開團啦！\n"
-        if original_price > 0:
-            result += f"💰 原價：${original_price}\n"
-        result += f"🏷️ 團購價：${group_price}\n"
-        result += f"\n✨ 商品特色：\n{product_desc}\n"
-        result += f"\n👉 下單傳送門：{product_link}"
+        result = f"🔥 【熱門團課】{course_name} 開團揪人！\n\n"
         
-        st.success("生成成功！請複製下方文字：")
+        if original_price > 0:
+            result += f"💰 原價學費：${original_price}\n"
+        result += f"🏷️ 團報優惠：${group_price} "
+        
+        if original_price > group_price:
+             result += f"(現省 ${original_price - group_price}❗)\n"
+        else:
+             result += "\n"
+             
+        result += f"\n✨ 課程亮點：\n{course_highlights}\n"
+        result += f"\n👉 手刀報名連結：{course_link}\n"
+        result += "\n--------------------------------\n💬 還有名額，要加+1，滿團即止！"
+        
+        st.success("生成成功！請複製下方文字貼到群組：")
         st.code(result)
